@@ -3,6 +3,50 @@
   <head>
     <meta charset="utf-8">
     <title>Hello wasm-pack!</title>
+    <style>
+      span.tick {
+        display: inline-block;
+        width: 50px;
+        text-align: right;
+        padding-right: 5px;
+      }
+      span.type {
+        vertical-align: top;
+        word-wrap: break-word;
+      }
+      div.details {
+        display: inline-block;
+        width: calc(100vw - 210px);
+        height: 100vh;
+        overflow: auto;
+      }
+      div.list {
+        display: inline-block;
+      }
+      #root {
+        display: flex;
+        flex-direction: row;
+      }
+      table {
+        table-layout: fixed;
+      }
+      tr {
+        height: 30px;
+      }
+      td.type {
+        vertical-align: top;
+        width: 160px;
+      }
+      p {
+        margin: 8px 0;
+      }
+      html, body, #root {
+        padding: 0;
+        margin: 0;
+        height: 100%;
+        width: 100%;
+      }
+    </style>
   </head>
   <body>
     <noscript>This page contains webassembly and javascript content, please enable javascript in your browser.</noscript>

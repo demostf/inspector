@@ -204,25 +204,51 @@ export type Message =
 }
     | (
     | {
-    SayText2: SayText2Message;
+    client: number;
+    from?: string | null;
+    kind: ChatMessageKind;
+    raw: number;
+    text: string;
+    type: "SayText2";
+    [k: string]: unknown;
 }
     | {
-    Text: TextMessage;
+    location: HudTextLocation;
+    substitute: [string, string, string, string];
+    text: string;
+    type: "Text";
+    [k: string]: unknown;
 }
     | {
-    ResetHUD: ResetHudMessage;
+    data: number;
+    type: "ResetHUD";
+    [k: string]: unknown;
 }
     | {
-    Train: TrainMessage;
+    data: number;
+    type: "Train";
+    [k: string]: unknown;
 }
     | {
-    VoiceSubtitle: VoiceSubtitleMessage;
+    client: number;
+    item: number;
+    menu: number;
+    type: "VoiceSubtitle";
+    [k: string]: unknown;
 }
     | {
-    Shake: ShakeMessage;
+    amplitude: number;
+    command: number;
+    duration: number;
+    frequency: number;
+    type: "Shake";
+    [k: string]: unknown;
 }
     | {
-    Unknown: [number, UnknownUserMessage];
+    data: BitReadStream;
+    raw_type: number;
+    type: "Unknown";
+    [k: string]: unknown;
 }
     )
     | {
@@ -3249,45 +3275,6 @@ export interface Vector {
     x: number;
     y: number;
     z: number;
-    [k: string]: unknown;
-}
-export interface SayText2Message {
-    client: number;
-    from?: string | null;
-    kind: ChatMessageKind;
-    raw: number;
-    text: string;
-    [k: string]: unknown;
-}
-export interface TextMessage {
-    location: HudTextLocation;
-    substitute: [string, string, string, string];
-    text: string;
-    [k: string]: unknown;
-}
-export interface ResetHudMessage {
-    data: number;
-    [k: string]: unknown;
-}
-export interface TrainMessage {
-    data: number;
-    [k: string]: unknown;
-}
-export interface VoiceSubtitleMessage {
-    client: number;
-    item: number;
-    menu: number;
-    [k: string]: unknown;
-}
-export interface ShakeMessage {
-    amplitude: number;
-    command: number;
-    duration: number;
-    frequency: number;
-    [k: string]: unknown;
-}
-export interface UnknownUserMessage {
-    data: BitReadStream;
     [k: string]: unknown;
 }
 export interface PacketEntity {

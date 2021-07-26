@@ -3,20 +3,25 @@ import React, {useCallback, Component} from 'react'
 import {useDropzone} from 'react-dropzone'
 import ReactDOM from "react-dom";
 import {Header} from "./header";
+import {PacketDetails, PacketTable} from "./table";
 
-class App extends Component<{}, {
+interface AppState {
     loading: boolean,
     header: Header | null,
-    packets: Packet[]
-}> {
-    state: {
-        loading: boolean,
-        header: Header | null,
-        packets: Packet[]
-    } = {
+    packets: Packet[],
+    prop_names: Map<number, { table: String, prop: String }>,
+    class_names: Map<number, String>,
+    active: Packet | null,
+}
+
+class App extends Component<{}, AppState> {
+    state: AppState = {
         loading: false,
         header: null,
-        packets: []
+        packets: [],
+        prop_names: new Map(),
+        class_names: new Map(),
+        active: null,
     }
 
     load(data: ArrayBuffer) {
@@ -33,6 +38,19 @@ class App extends Component<{}, {
                     let packets = this.state.packets;
                     packets.push(packet);
                     this.setState({packets});
+                    if (packet.type == "DataTables") {
+                        let prop_names = this.state.prop_names;
+                        let class_names = this.state.class_names;
+                        for (let table of packet.tables) {
+                            for (let prop of table.props) {
+                                prop_names.set(prop.identifier, {table: table.name, prop: prop.name});
+                            }
+                        }
+                        for (let server_class of packet.server_classes) {
+                            class_names.set(server_class.id, server_class.name);
+                        }
+                        this.setState({class_names, prop_names});
+                    }
                     break;
                 case "done":
                     this.setState({loading: false});
@@ -46,58 +64,78 @@ class App extends Component<{}, {
     render() {
         if (this.state.loading && this.state.header && this.state.packets.length) {
             return (
-                <div>
+                <>
                     <h1>Loading</h1>
                     <p>{this.state.packets.slice(-1)[0].tick}/{this.state.header.ticks}</p>
-                </div>
+                </>
             )
         } else if (this.state.loading) {
             return (
-                <div>
+                <>
                     <h1>Loading</h1>
-                </div>
+                </>
             )
         } else if (this.state.packets.length) {
+            let active = <></>;
+            if (this.state.active) {
+                active = <div className="details"><PacketDetails packet={this.state.active}
+                                                                 prop_names={this.state.prop_names}
+                                                                 class_names={this.state.class_names}/></div>
+            }
             return (
-                <div>
-                    <h1>{this.state.packets.length}</h1>
-                </div>
+                <>
+                    <PacketTable packets={this.state.packets} class_names={this.state.class_names}
+                                 prop_names={this.state.prop_names} onClick={active => this.setState({active})}/>
+                    {active}
+                </>
             )
-        } else {
+        }
+    else
+        {
             return (
-                <div>
+                <>
                     <DemoDropzone onDrop={(data) => this.load(data)}/>
-                </div>
+                </>
             )
         }
     }
-}
+    }
 
-ReactDOM.render(
-    <App/>,
+    ReactDOM.render(
+        <App/>
+    ,
     document.getElementById("root")
-);
+    );
 
 
-function DemoDropzone({onDrop}: { onDrop: (data: ArrayBuffer) => void }) {
-    const onDropCb = useCallback(acceptedFiles => {
-        let reader = new FileReader();
-        reader.readAsArrayBuffer(acceptedFiles[0]);
-        reader.addEventListener('load', () => {
-            let result = reader.result as ArrayBuffer;
-            onDrop(result)
-        });
-    }, [])
-    const {getRootProps, getInputProps, isDragActive} = useDropzone({onDrop: onDropCb})
-
-    return (
-        <div {...getRootProps()}>
-            <input {...getInputProps()} />
-            {
-                isDragActive ?
-                    <p>Drop the files here ...</p> :
-                    <p>Drag 'n' drop some files here, or click to select files</p>
-            }
-        </div>
+    function DemoDropzone(
+        {
+            onDrop
+        }
+    :
+        {
+            onDrop: (data: ArrayBuffer) => void
+        }
     )
-}
+        {
+            const onDropCb = useCallback(acceptedFiles => {
+                let reader = new FileReader();
+                reader.readAsArrayBuffer(acceptedFiles[0]);
+                reader.addEventListener('load', () => {
+                    let result = reader.result as ArrayBuffer;
+                    onDrop(result)
+                });
+            }, [])
+            const {getRootProps, getInputProps, isDragActive} = useDropzone({onDrop: onDropCb})
+
+            return (
+                <div {...getRootProps()}>
+                    <input {...getInputProps()} />
+                    {
+                        isDragActive ?
+                            <p>Drop the files here ...</p> :
+                            <p>Drag 'n' drop some files here, or click to select files</p>
+                    }
+                </div>
+            )
+        }
