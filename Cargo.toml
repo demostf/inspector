@@ -11,8 +11,8 @@ crate-type = ["cdylib", "rlib"]
 default = ["console_error_panic_hook"]
 
 [dependencies]
-bitbuffer = { version = "0.10", path = "../../bitbuffer" }
-tf-demo-parser = { version = "0.3", path = "../tf-demo-parser" }
+bitbuffer = { version = "0.10" }
+tf-demo-parser = { version = "0.3" }
 serde_json = "1"
 wasm-bindgen = { version = "0.2", features = ["serde-serialize"] }
 
@@ -33,5 +33,4 @@ wee_alloc = { version = "0.4.5", optional = true }
 wasm-bindgen-test = "0.3.13"
 
 [profile.release]
-# Tell `rustc` to optimize for small code size.
-opt-level = "s"
+lto = true
