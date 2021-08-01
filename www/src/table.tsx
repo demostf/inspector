@@ -132,7 +132,7 @@ const PacketRowMemo = React.memo(PacketRow, (a, b) => a.i == b.i);
 function messageInfoText(msg: Message, prop_names: Map<number, { table: String, prop: String }>, class_names: Map<number, String>) {
     switch (msg.type) {
         case "Print":
-            return <>msg.value</>
+            return <>{msg.value}</>
         case "ServerInfo":
             return <>stv: {msg.stv ? 'true' : 'false'}, map: {msg.map}, player count: {msg.player_count},
                 map: {msg.map}</>
@@ -158,9 +158,27 @@ function messageInfoText(msg: Message, prop_names: Map<number, { table: String, 
                 deleted = <>deleted: {msg.removed_entities.join(', ')}</>
             }
             return <>
+                <p>delta: {JSON.stringify(msg.delta)}</p>
+                <p>baseline: {JSON.stringify(msg.base_line)}</p>
+                <p>max: {JSON.stringify(msg.max_entries)}</p>
+                <p>updated base line: {JSON.stringify(msg.updated_base_line)}</p>
                 {entities}
                 {deleted}
             </>
+        case "TempEntities":
+            let events = msg.events.map(event => {
+                let class_name = class_names.get(event.class_id);
+                let props = event.props.map(prop => {
+                    let names = prop_names.get(prop.identifier);
+                    if (names) {
+                        return `${names.table}.${names.prop}=${formatPropValue(prop.value)}`;
+                    } else {
+                        return `[unknown prop]=${prop.value}`;
+                    }
+                });
+                return `temp entity ${class_name}(delay: ${event.fire_delay}, reliable:${JSON.stringify(event.reliable)}): ` + props.join(', ');
+            })
+            return <>{events.map(event => <p>{event}</p>)}</>
         default:
             let json = msg;
             delete json.type;
