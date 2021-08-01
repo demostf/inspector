@@ -3281,6 +3281,7 @@ export interface PacketEntity {
     delay?: number | null;
     entity_index: EntityId;
     in_pvs: boolean;
+    baseline_props: SendProp[];
     props: SendProp[];
     pvs: PVS;
     serial_number: number;

@@ -92,6 +92,7 @@ export function filterPacket(
 }
 
 function filterPropNames(prop_names: Map<number, { table: string, prop: string }>, filter: string): number[] {
+    filter = filter.toLowerCase();
     let ids = [];
     for (let [id, {table, prop}] of prop_names.entries()) {
         if (table.toLowerCase().includes(filter) || prop.toLowerCase().includes(filter)) {
@@ -102,6 +103,7 @@ function filterPropNames(prop_names: Map<number, { table: string, prop: string }
 }
 
 function filterClassNames(class_names: Map<number, string>, filter: string): number[] {
+    filter = filter.toLowerCase();
     let ids = [];
     for (let [id, name] of class_names.entries()) {
         if (name.toLowerCase().includes(filter)) {
@@ -141,7 +143,7 @@ export function filterMessage(
         case "GameEvent":
             return search.entity == 0 && message.event.type.includes(search.filter)
         case "PacketEntities":
-            return message.removed_entities.includes(search.entity) || message.entities.some(entity => (search.entity == 0 || entity.entity_index == search.entity) && filterEntity(entity.server_class, entity.props, search))
+            return message.removed_entities.includes(search.entity) || message.entities.some(entity => (search.entity == 0 || entity.entity_index == search.entity) && filterEntity(entity.server_class, entity.baseline_props.concat(entity.props), search))
         case "TempEntities":
             return search.entity == 0 && message.events.some(event => filterEntity(event.class_id, event.props, search))
         case "GetCvarValue":
