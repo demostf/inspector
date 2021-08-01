@@ -10,19 +10,27 @@ span.type {
 }
 
 div.details {
-    display: inline-block;
-    width: calc(100vw - 210px);
-    height: 100vh;
+    flex-grow: 1;
     overflow: auto;
+    width: calc(100vw - 210px);
+    height: 100%;
 }
 
 div.list {
-    display: inline-block;
 }
 
 #root {
+    height: 100%;
     display: flex;
-    flex-direction: row;
+    flex-direction: column;
+
+    .packets {
+        min-height: 0;
+        flex: 1;
+        display: flex;
+        flex-direction: row;
+        position: relative;
+    }
 }
 
 table {
@@ -51,9 +59,11 @@ html, body, #root {
 
 .prop_row {
     margin: 0;
+
     &.active {
         background: #ccc;
     }
+
     display: inline-flex;
     align-items: center;
 

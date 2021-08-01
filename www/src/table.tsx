@@ -3,11 +3,12 @@ import {GameEventDefinition, Message, Packet, PacketEntity, SendPropValue, UserC
 import {FixedSizeList as List} from 'react-window';
 import {MessageInfo} from "./packets/message";
 import {UserCmdDetails} from "./packets/usercmd";
+import {filterMessage, filterPacket, Search} from "./search";
 
 interface TableProps {
     packets: Packet[],
-    prop_names: Map<number, { table: String, prop: String }>,
-    class_names: Map<number, String>,
+    prop_names: Map<number, { table: string, prop: string }>,
+    class_names: Map<number, string>,
     onClick: (i: number, packet: Packet) => void,
     activeIndex: number | null,
 }
@@ -23,7 +24,7 @@ export function PacketTable({packets, prop_names, class_names, onClick, activeIn
 
     return (
         <>
-            <List className="list" height={window.innerHeight} itemCount={packets.length} itemSize={30} width={210}>
+            <List className="list" height={window.innerHeight - 31} itemCount={packets.length} itemSize={30} width={210}>
                 {Row}
             </List>
         </>
@@ -77,17 +78,26 @@ export function PacketRow({packet}: RowProps) {
 
 interface DetailProps {
     packet: Packet,
-    prop_names: Map<number, { table: String, prop: String }>,
-    class_names: Map<number, String>,
+    prop_names: Map<number, { table: string, prop: string }>,
+    class_names: Map<number, string>,
+    search: Search,
 }
 
-export function PacketDetails({packet, prop_names, class_names}: DetailProps) {
+function filteredMessages(messages: Message[], search: Search) {
+    if (search.filter || search.entity) {
+        return messages.filter(message => filterMessage(message, search));
+    } else {
+        return messages;
+    }
+}
+
+export function PacketDetails({packet, prop_names, class_names, search}: DetailProps) {
     switch (packet.type) {
         case "Sigon":
         case "Message":
-            let rows = packet.messages.map((message, y) => <tr key={y}>
+            let rows = filteredMessages(packet.messages, search).map((message, y) => <tr key={y}>
                 <td className="type">{message.type}</td>
-                <td><MessageInfo msg={message} prop_names={prop_names} class_names={class_names}/></td>
+                <td><MessageInfo msg={message} prop_names={prop_names} class_names={class_names} search={search}/></td>
             </tr>)
             return (
                 <table>

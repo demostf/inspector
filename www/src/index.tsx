@@ -4,6 +4,7 @@ import {useDropzone} from 'react-dropzone'
 import ReactDOM from "react-dom";
 import {Header} from "./header";
 import {PacketDetails, PacketTable} from "./table";
+import {filterPacket, Search, SearchBar} from "./search";
 
 let _style = require('../styles/style.css');
 
@@ -11,10 +12,11 @@ interface AppState {
     loading: boolean,
     header: Header | null,
     packets: Packet[],
-    prop_names: Map<number, { table: String, prop: String }>,
-    class_names: Map<number, String>,
+    prop_names: Map<number, { table: string, prop: string }>,
+    class_names: Map<number, string>,
     active: Packet | null,
     activeIndex: number | null,
+    search: Search,
 }
 
 class App extends Component<{}, AppState> {
@@ -26,7 +28,15 @@ class App extends Component<{}, AppState> {
         class_names: new Map(),
         active: null,
         activeIndex: null,
+        search: {
+            entity: 0,
+            filter: "",
+            classIds: [],
+            propIds: [],
+        }
     }
+
+    onSearch = debounce((search: Search) => this.setState({search}), 500)
 
     load(data: ArrayBuffer) {
         this.setState({loading: true});
@@ -65,6 +75,14 @@ class App extends Component<{}, AppState> {
         worker.postMessage(data, [data]);
     }
 
+    filteredPackets(): Packet[] {
+        if (this.state.search.filter || this.state.search.entity) {
+            return this.state.packets.filter(packet => filterPacket(packet, this.state.search));
+        } else {
+            return this.state.packets;
+        }
+    }
+
     render() {
         if (this.state.loading && this.state.header && this.state.packets.length) {
             return (
@@ -83,16 +101,20 @@ class App extends Component<{}, AppState> {
             let active = <></>;
             if (this.state.active) {
                 active = <div className="details"><PacketDetails packet={this.state.active}
+                                                                 search={this.state.search}
                                                                  prop_names={this.state.prop_names}
                                                                  class_names={this.state.class_names}/></div>
             }
             return (
                 <>
-                    <PacketTable packets={this.state.packets} class_names={this.state.class_names}
-                                 activeIndex={this.state.activeIndex}
-                                 prop_names={this.state.prop_names}
-                                 onClick={(activeIndex, active) => this.setState({activeIndex, active})}/>
-                    {active}
+                    <SearchBar onSearch={this.onSearch} class_names={this.state.class_names} prop_names={this.state.prop_names}/>
+                    <div className="packets">
+                        <PacketTable packets={this.filteredPackets()} class_names={this.state.class_names}
+                                     activeIndex={this.state.activeIndex}
+                                     prop_names={this.state.prop_names}
+                                     onClick={(activeIndex, active) => this.setState({activeIndex, active})}/>
+                        {active}
+                    </div>
                 </>
             )
         } else {
@@ -141,4 +163,12 @@ function DemoDropzone(
             }
         </div>
     )
+}
+
+function debounce(func: Function, timeout = 300){
+    let timer: any;
+    return (...args:any[]) => {
+        clearTimeout(timer);
+        timer = setTimeout(() => { func.apply(this, args); }, timeout);
+    };
 }

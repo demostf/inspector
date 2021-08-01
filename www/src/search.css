@@ -1,0 +1,25 @@
+.search > form {
+    display: flex;
+    flex-direction: row;
+
+    .filter {
+        flex-grow: 1;
+    }
+
+    label {
+        margin: 0 5px;
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+    }
+
+    input {
+        flex-grow: 1;
+        width: 150px;
+        margin: 0 5px;
+        height: 24px;
+        border-color: #ddd;
+    }
+
+    border-bottom: 1px solid #888;
+}
