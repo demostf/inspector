@@ -12,6 +12,7 @@ interface AppState {
     prop_names: Map<number, { table: String, prop: String }>,
     class_names: Map<number, String>,
     active: Packet | null,
+    activeIndex: number | null,
 }
 
 class App extends Component<{}, AppState> {
@@ -22,6 +23,7 @@ class App extends Component<{}, AppState> {
         prop_names: new Map(),
         class_names: new Map(),
         active: null,
+        activeIndex: null,
     }
 
     load(data: ArrayBuffer) {
@@ -85,7 +87,8 @@ class App extends Component<{}, AppState> {
             return (
                 <>
                     <PacketTable packets={this.state.packets} class_names={this.state.class_names}
-                                 prop_names={this.state.prop_names} onClick={active => this.setState({active})}/>
+                                 activeIndex={this.state.activeIndex}
+                                 prop_names={this.state.prop_names} onClick={(activeIndex, active) => this.setState({activeIndex, active})}/>
                     {active}
                 </>
             )

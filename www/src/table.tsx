@@ -6,15 +6,17 @@ interface TableProps {
     packets: Packet[],
     prop_names: Map<number, { table: String, prop: String }>,
     class_names: Map<number, String>,
-    onClick: (packet: Packet) => void,
+    onClick: (i: number, packet: Packet) => void,
+    activeIndex: number | null,
 }
 
-export function PacketTable({packets, prop_names, class_names, onClick}: TableProps) {
+export function PacketTable({packets, prop_names, class_names, onClick, activeIndex}: TableProps) {
     const Row: (props: { index: number, style: CSSProperties }) => any = ({index, style}) => (
-        <PacketRowMemo style={style} key={index} i={index} packet={packets[index]} class_names={class_names}
-                       prop_names={prop_names}
-                       onClick={onClick}
-                       expanded={false}/>
+        <div key={index} onClick={() => {
+            onClick(index, packets[index])
+        }} style={style} className={(activeIndex == index ? 'active ' : '') + 'prop_row'}>
+            <PacketRow packet={packets[index]}/>
+        </div>
     );
 
     return (
@@ -27,67 +29,47 @@ export function PacketTable({packets, prop_names, class_names, onClick}: TablePr
 }
 
 interface RowProps {
-    style: CSSProperties,
-    i: number,
     packet: Packet,
-    prop_names: Map<number, { table: String, prop: String }>,
-    class_names: Map<number, String>,
-    expanded: boolean,
-    onClick: (packet: Packet) => void,
 }
 
-export function PacketRow({style, i, packet, onClick}: RowProps) {
+export function PacketRow({packet}: RowProps) {
     switch (packet.type) {
         case "Sigon":
         case "Message":
-            return <div onClick={() => {
-                onClick(packet)
-            }} style={style} key={`packet-${i}`}>
+            return <>
                 <span className="tick">{packet.tick}</span>
                 <span className="type">{packet.type}</span>
-            </div>
+            </>
         case "SyncTick":
-            return <div onClick={() => {
-                onClick(packet)
-            }} style={style} key={`packet-${i}`}>
+            return <>
                 <span className="tick">{packet.tick}</span>
                 <span className="type">{packet.type}</span>
-            </div>;
+            </>;
         case "ConsoleCmd":
-            return <div onClick={() => {
-                onClick(packet)
-            }} style={style} key={`packet-${i}`}>
+            return <>
                 <span className="tick">{packet.tick}</span>
                 <span className="type">{packet.type}</span>
-            </div>;
+            </>;
         case "UserCmd":
-            return <div onClick={() => {
-                onClick(packet)
-            }} style={style} key={`packet-${i}`}>
+            return <>
                 <span className="tick">{packet.tick}</span>
                 <span className="type">{packet.type}</span>
-            </div>;
+            </>;
         case "DataTables":
-            return <div onClick={() => {
-                onClick(packet)
-            }} style={style} key={`packet-${i}`}>
+            return <>
                 <span className="tick">{packet.tick}</span>
                 <span className="type">{packet.type}</span>
-            </div>;
+            </>;
         case "Stop":
-            return <div onClick={() => {
-                onClick(packet)
-            }} style={style} key={`packet-${i}`}>
+            return <>
                 <span className="tick">{packet.tick}</span>
                 <span className="type">{packet.type}</span>
-            </div>;
+            </>;
         case "StringTables":
-            return <div onClick={() => {
-                onClick(packet)
-            }} style={style} key={`packet-${i}`}>
+            return <>
                 <span className="tick">{packet.tick}</span>
                 <span className="type">{packet.type}</span>
-            </div>;
+            </>;
     }
 }
 
@@ -126,8 +108,6 @@ export function PacketDetails({packet, prop_names, class_names}: DetailProps) {
             return <>{packet.tables.length}</>
     }
 }
-
-const PacketRowMemo = React.memo(PacketRow, (a, b) => a.i == b.i);
 
 function messageInfoText(msg: Message, prop_names: Map<number, { table: String, prop: String }>, class_names: Map<number, String>) {
     switch (msg.type) {
