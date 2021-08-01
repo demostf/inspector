@@ -44,7 +44,7 @@ export class SearchBar extends Component<SearchBarProps, SearchBarState> {
     }
 
     onEntity(event: ChangeEvent<HTMLInputElement>) {
-        let entity = parseInt(event.target.value, 10);
+        let entity = parseInt(event.target.value, 10) || 0;
         this.setState({entity});
         setTimeout(() => this.props.onSearch(this.getSearch()), 1);
     }
