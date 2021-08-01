@@ -158,9 +158,10 @@ function DemoDropzone(
             <input {...getInputProps()} />
             {
                 isDragActive ?
-                    <p>Drop the files here ...</p> :
-                    <p>Drag 'n' drop some files here, or click to select files</p>
+                    <p>Drop the demo file here ...</p> :
+                    <p>Drag 'n' drop a demo here, or click to a file</p>
             }
+            <p className="warning">Warning, loading a 30m demo file can easily take over a gigabyte of memory</p>
         </div>
     )
 }
