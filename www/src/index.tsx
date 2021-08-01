@@ -5,6 +5,8 @@ import ReactDOM from "react-dom";
 import {Header} from "./header";
 import {PacketDetails, PacketTable} from "./table";
 
+let _style = require('../styles/style.css');
+
 interface AppState {
     loading: boolean,
     header: Header | null,
@@ -88,13 +90,12 @@ class App extends Component<{}, AppState> {
                 <>
                     <PacketTable packets={this.state.packets} class_names={this.state.class_names}
                                  activeIndex={this.state.activeIndex}
-                                 prop_names={this.state.prop_names} onClick={(activeIndex, active) => this.setState({activeIndex, active})}/>
+                                 prop_names={this.state.prop_names}
+                                 onClick={(activeIndex, active) => this.setState({activeIndex, active})}/>
                     {active}
                 </>
             )
-        }
-    else
-        {
+        } else {
             return (
                 <>
                     <DemoDropzone onDrop={(data) => this.load(data)}/>
@@ -102,43 +103,42 @@ class App extends Component<{}, AppState> {
             )
         }
     }
-    }
+}
 
-    ReactDOM.render(
-        <App/>
+ReactDOM.render(
+    <App/>
     ,
     document.getElementById("root")
-    );
+);
 
 
-    function DemoDropzone(
-        {
-            onDrop
-        }
-    :
+function DemoDropzone(
+    {
+        onDrop
+    }
+        :
         {
             onDrop: (data: ArrayBuffer) => void
         }
-    )
-        {
-            const onDropCb = useCallback(acceptedFiles => {
-                let reader = new FileReader();
-                reader.readAsArrayBuffer(acceptedFiles[0]);
-                reader.addEventListener('load', () => {
-                    let result = reader.result as ArrayBuffer;
-                    onDrop(result)
-                });
-            }, [])
-            const {getRootProps, getInputProps, isDragActive} = useDropzone({onDrop: onDropCb})
+) {
+    const onDropCb = useCallback(acceptedFiles => {
+        let reader = new FileReader();
+        reader.readAsArrayBuffer(acceptedFiles[0]);
+        reader.addEventListener('load', () => {
+            let result = reader.result as ArrayBuffer;
+            onDrop(result)
+        });
+    }, [])
+    const {getRootProps, getInputProps, isDragActive} = useDropzone({onDrop: onDropCb})
 
-            return (
-                <div {...getRootProps()}>
-                    <input {...getInputProps()} />
-                    {
-                        isDragActive ?
-                            <p>Drop the files here ...</p> :
-                            <p>Drag 'n' drop some files here, or click to select files</p>
-                    }
-                </div>
-            )
-        }
+    return (
+        <div className="dropzone"  {...getRootProps()}>
+            <input {...getInputProps()} />
+            {
+                isDragActive ?
+                    <p>Drop the files here ...</p> :
+                    <p>Drag 'n' drop some files here, or click to select files</p>
+            }
+        </div>
+    )
+}

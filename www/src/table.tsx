@@ -12,11 +12,11 @@ interface TableProps {
 
 export function PacketTable({packets, prop_names, class_names, onClick, activeIndex}: TableProps) {
     const Row: (props: { index: number, style: CSSProperties }) => any = ({index, style}) => (
-        <div key={index} onClick={() => {
+        <p key={index} onClick={() => {
             onClick(index, packets[index])
         }} style={style} className={(activeIndex == index ? 'active ' : '') + 'prop_row'}>
             <PacketRow packet={packets[index]}/>
-        </div>
+        </p>
     );
 
     return (
