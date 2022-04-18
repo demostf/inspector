@@ -9,5 +9,5 @@ export interface Header {
     duration: number,
     ticks: number,
     frames: number,
-    sigon: number
+    signon: number
 }

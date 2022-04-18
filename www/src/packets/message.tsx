@@ -22,7 +22,7 @@ export function MessageInfo({msg, prop_names, class_names, search}: MessageInfoP
             return <>{msg.reliable ? 'reliable' : 'unreliable'} {msg.num} sounds: {msg.length} bits</>
         case "VoiceInit":
             return <>{msg.codec} at quality {msg.quality} and sampling rage {msg.sampling_rate}</>
-        case "SigOnState":
+        case "SignOnState":
             return <>state: {msg.state}, count: {msg.count}</>
         case "SetConVar":
             return <>{msg.vars.map(cvar => `${cvar.key}=${cvar.value}`).join(', ')}</>
@@ -96,7 +96,7 @@ function formatEntity(entity: PacketEntity, prop_names: Map<number, { table: Str
             return `[unknown prop]=${prop.value}`;
         }
     })
-    return `entity ${entity.entity_index}(${class_name}) ${entity.pvs}: ` + baseline.concat(props).join(', ');
+    return `entity ${entity.entity_index}(${class_name}) ${entity.update_type}: ` + baseline.concat(props).join(', ');
 }
 
 function formatEventDefinition(event: GameEventDefinition): string {

@@ -37,7 +37,7 @@ interface RowProps {
 
 export function PacketRow({packet}: RowProps) {
     switch (packet.type) {
-        case "Sigon":
+        case "Signon":
         case "Message":
             return <>
                 <span className="tick">{packet.tick}</span>
@@ -93,7 +93,7 @@ function filteredMessages(messages: Message[], search: Search) {
 
 export function PacketDetails({packet, prop_names, class_names, search}: DetailProps) {
     switch (packet.type) {
-        case "Sigon":
+        case "Signon":
         case "Message":
             let rows = filteredMessages(packet.messages, search).map((message, y) => <tr key={y}>
                 <td className="type">{message.type}</td>

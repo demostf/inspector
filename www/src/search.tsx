@@ -73,7 +73,7 @@ export function filterPacket(
     search: Search,
 ): boolean {
     switch (packet.type) {
-        case "Sigon":
+        case "Signon":
         case "Message":
             return packet.messages.some(msg => filterMessage(msg, search))
         case "SyncTick":

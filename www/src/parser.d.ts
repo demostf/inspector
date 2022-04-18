@@ -10,7 +10,7 @@ export type Packet =
     messages: Message[];
     meta: MessagePacketMeta;
     tick: number;
-    type: "Sigon";
+    type: "Signon";
     [k: string]: unknown;
 }
     | {
@@ -88,8 +88,8 @@ export type Message =
 }
     | {
     count: number;
-    state: number;
-    type: "SigOnState";
+    state: SignOnState;
+    type: "SignOnState";
     [k: string]: unknown;
 }
     | {
@@ -309,6 +309,7 @@ export type Message =
     type: "CmdKeyValues";
     [k: string]: unknown;
 };
+export type SignOnState = "None" | "Challenge" | "Connected" | "New" | "PreSpawn" | "Spawn" | "Full" | "ChangeLevel";
 export type ChatMessageKind =
     | "TF_Chat_All"
     | "TF_Chat_Team"
@@ -3211,11 +3212,11 @@ export type GameEventValue =
     Boolean: boolean;
 };
 export type GameEventTypeId = number;
-export type EntityId = number;
 export type SendPropIdentifier = number;
 export type SendPropValue = Vector | VectorXY | number | number | string | SendPropValue[];
-export type PVS = "Preserve" | "Leave" | "Enter" | "Delete";
+export type EntityId = number;
 export type ClassId = number;
+export type UpdateType = "Preserve" | "Leave" | "Enter" | "Delete";
 export type GameEventValueType = "None" | "String" | "Float" | "Long" | "Short" | "Byte" | "Boolean" | "Local";
 export type SendTableName = string;
 export type ServerClassName = string;
@@ -3278,14 +3279,14 @@ export interface Vector {
     [k: string]: unknown;
 }
 export interface PacketEntity {
+    baseline_props: SendProp[];
     delay?: number | null;
     entity_index: EntityId;
     in_pvs: boolean;
-    baseline_props: SendProp[];
     props: SendProp[];
-    pvs: PVS;
     serial_number: number;
     server_class: ClassId;
+    update_type: UpdateType;
     [k: string]: unknown;
 }
 export interface SendProp {
