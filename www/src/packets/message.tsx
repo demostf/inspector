@@ -62,7 +62,7 @@ export function MessageInfo({msg, prop_names, class_names, search}: MessageInfoP
             return <>{events.map(event => <p>{event}</p>)}</>
         default:
             let json = msg;
-            delete json.type;
+            // delete json.type;
             return <>{JSON.stringify(json)}</>
     }
 }
