@@ -154,7 +154,8 @@ export function filterMessage(
 }
 
 export function filterEntity(class_id: number, props: SendProp[], search: Search): boolean {
-    return search.classIds.includes(class_id) || props.some(prop => search.propIds.includes(prop.identifier));
+    return search.classIds.includes(class_id) || props.some(prop => search.propIds.includes(prop.identifier))
+        || props.some(prop => prop.value == search.filter);
 }
 
 function filterStringTable(table: StringTable, search: Search): boolean {
