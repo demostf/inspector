@@ -14,7 +14,7 @@ export function MessageInfo({msg, prop_names, class_names, search}: MessageInfoP
         case "Print":
             return <>{msg.value}</>
         case "ServerInfo":
-            return <>stv: {msg.stv ? 'true' : 'false'}, map: {msg.map}, player count: {msg.player_count},
+            return <>stv: {msg.stv ? 'true' : 'false'}, map: {msg.map}, player slot: {msg.player_slot},
                 map: {msg.map}</>
         case "NetTick":
             return <>Tick {msg.tick}, frame time: {msg.frame_time}, std_dev: {msg.std_dev}</>

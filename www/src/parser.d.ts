@@ -124,7 +124,7 @@ export type Message =
     max_crc: number;
     max_player_count: number;
     platform: string;
-    player_count: number;
+    player_slot: number;
     replay: boolean;
     server_count: number;
     server_name: string;
