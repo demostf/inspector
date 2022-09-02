@@ -80,14 +80,15 @@ function formatPropValue(value: SendPropValue): string {
 
 function formatEntity(entity: PacketEntity, prop_names: Map<number, { table: String, prop: String }>, class_names: Map<number, String>,): string {
     let class_name = class_names.get(entity.server_class);
-    let baseline = entity.baseline_props.map(prop => {
-        let names = prop_names.get(prop.identifier);
-        if (names) {
-            return `(${names.table}.${names.prop})=${formatPropValue(prop.value)}`;
-        } else {
-            return `([unknown prop])=${prop.value}`;
-        }
-    })
+    // let baseline = entity.baseline_props.map(prop => {
+    //     let names = prop_names.get(prop.identifier);
+    //     if (names) {
+    //         return `(${names.table}.${names.prop})=${formatPropValue(prop.value)}`;
+    //     } else {
+    //         return `([unknown prop])=${prop.value}`;
+    //     }
+    // })
+
     let props = entity.props.map(prop => {
         let names = prop_names.get(prop.identifier);
         if (names) {
@@ -96,7 +97,7 @@ function formatEntity(entity: PacketEntity, prop_names: Map<number, { table: Str
             return `[unknown prop]=${prop.value}`;
         }
     })
-    return `entity ${entity.entity_index}(${class_name}) ${entity.update_type}: ` + baseline.concat(props).join(', ');
+    return `entity ${entity.entity_index}(${class_name}) ${entity.update_type}: ` + props.join(', ');
 }
 
 function formatEventDefinition(event: GameEventDefinition): string {

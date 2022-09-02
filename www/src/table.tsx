@@ -4,20 +4,21 @@ import {FixedSizeList as List} from 'react-window';
 import {MessageInfo} from "./packets/message";
 import {UserCmdDetails} from "./packets/usercmd";
 import {filterMessage, filterPacket, Search} from "./search";
+import {PacketMeta, PacketType} from "./index"
 
 interface TableProps {
-    packets: Packet[],
+    packets: PacketMeta[],
     prop_names: Map<number, { table: string, prop: string }>,
     class_names: Map<number, string>,
-    onClick: (i: number, packet: Packet) => void,
+    onClick: (i: number) => void,
     activeIndex: number | null,
 }
 
 export function PacketTable({packets, prop_names, class_names, onClick, activeIndex}: TableProps) {
     const Row: (props: { index: number, style: CSSProperties }) => any = ({index, style}) => (
-        <p key={index} onClick={() => {
-            onClick(index, packets[index])
-        }} style={style} className={(activeIndex == index ? 'active ' : '') + 'prop_row'}>
+        <p key={packets[index].index} onClick={() => {
+            onClick(packets[index].index)
+        }} style={style} className={(activeIndex == packets[index].index ? 'active ' : '') + 'prop_row'}>
             <PacketRow packet={packets[index]}/>
         </p>
     );
@@ -32,46 +33,46 @@ export function PacketTable({packets, prop_names, class_names, onClick, activeIn
 }
 
 interface RowProps {
-    packet: Packet,
+    packet: PacketMeta,
 }
 
 export function PacketRow({packet}: RowProps) {
-    switch (packet.type) {
-        case "Signon":
-        case "Message":
+    switch (packet.ty) {
+        case PacketType.Signon:
+        case PacketType.Message:
             return <>
                 <span className="tick">{packet.tick}</span>
-                <span className="type">{packet.type}</span>
+                <span className="type">{PacketType[packet.ty]}</span>
             </>
-        case "SyncTick":
+        case PacketType.SyncTick:
             return <>
                 <span className="tick">{packet.tick}</span>
-                <span className="type">{packet.type}</span>
+                <span className="type">{PacketType[packet.ty]}</span>
             </>;
-        case "ConsoleCmd":
+        case PacketType.ConsoleCmd:
             return <>
                 <span className="tick">{packet.tick}</span>
-                <span className="type">{packet.type}</span>
+                <span className="type">{PacketType[packet.ty]}</span>
             </>;
-        case "UserCmd":
+        case PacketType.UserCmd:
             return <>
                 <span className="tick">{packet.tick}</span>
-                <span className="type">{packet.type}</span>
+                <span className="type">{PacketType[packet.ty]}</span>
             </>;
-        case "DataTables":
+        case PacketType.DataTables:
             return <>
                 <span className="tick">{packet.tick}</span>
-                <span className="type">{packet.type}</span>
+                <span className="type">{PacketType[packet.ty]}</span>
             </>;
-        case "Stop":
+        case PacketType.Stop:
             return <>
                 <span className="tick">{packet.tick}</span>
-                <span className="type">{packet.type}</span>
+                <span className="type">{PacketType[packet.ty]}</span>
             </>;
-        case "StringTables":
+        case PacketType.StringTables:
             return <>
                 <span className="tick">{packet.tick}</span>
-                <span className="type">{packet.type}</span>
+                <span className="type">{PacketType[packet.ty]}</span>
             </>;
     }
 }

@@ -8,21 +8,46 @@ import {filterPacket, Search, SearchBar} from "./search";
 
 let _style = require('../styles/style.css');
 
+export interface PacketMeta {
+    index: number,
+    tick: number,
+    ty: PacketType,
+}
+
+export enum PacketType {
+    Signon = 1,
+    Message = 2,
+    SyncTick = 3,
+    ConsoleCmd = 4,
+    UserCmd = 5,
+    DataTables = 6,
+    Stop = 7,
+    StringTables = 8,
+}
+
 interface AppState {
     loading: boolean,
     header: Header | null,
-    packets: Packet[],
+    progress: number,
+    packets: PacketMeta[],
     prop_names: Map<number, { table: string, prop: string }>,
     class_names: Map<number, string>,
     active: Packet | null,
     activeIndex: number | null,
     search: Search,
+    worker: Worker
 }
+
+type MessageData = { type: "progress", progress: number }
+    | { type: "packet", packet: Packet }
+    | { type: "done", packets: PacketMeta[], header: Header, prop_names: {identifier: number, table: string, prop: string}[], class_names: {identifier: number, name: string}[] }
+    | { type: "packet_names", packet: {} };
 
 class App extends Component<{}, AppState> {
     state: AppState = {
         loading: false,
         header: null,
+        progress: 0,
         packets: [],
         prop_names: new Map(),
         class_names: new Map(),
@@ -33,7 +58,8 @@ class App extends Component<{}, AppState> {
             filter: "",
             classIds: [],
             propIds: [],
-        }
+        },
+        worker: null
     }
 
     onSearch = debounce((search: Search) => this.setState({search}), 500)
@@ -41,54 +67,53 @@ class App extends Component<{}, AppState> {
     load(data: ArrayBuffer) {
         this.setState({loading: true});
         const worker = new Worker('./worker.js');
-        worker.addEventListener("message", (event: MessageEvent<{ type: "header", header: Header } | { type: "packet", packet: Packet } | { type: "done" }>) => {
-            switch (event.data.type) {
-                case "header":
-                    let header = event.data.header;
-                    this.setState({header});
-                    break;
-                case "packet":
-                    let packet = event.data.packet;
-                    let packets = this.state.packets;
-                    packets.push(packet);
-                    this.setState({packets});
-                    if (packet.type == "DataTables") {
-                        let prop_names = this.state.prop_names;
-                        let class_names = this.state.class_names;
-                        for (let table of packet.tables) {
-                            for (let prop of table.props) {
-                                prop_names.set(prop.identifier, {table: table.name, prop: prop.name});
-                            }
-                        }
-                        for (let server_class of packet.server_classes) {
-                            class_names.set(server_class.id, server_class.name);
-                        }
-                        this.setState({class_names, prop_names});
-                    }
+        this.setState({worker});
+        worker.addEventListener("message", (event: MessageEvent<MessageData>) => {
+            const data = event.data;
+            if (data.type !== "progress") {
+                console.log(data);
+            }
+            switch (data.type) {
+                case "progress":
+                    let progress = data.progress;
+                    this.setState({progress});
                     break;
                 case "done":
-                    this.setState({loading: false});
+                    const prop_names = new Map();
+                    for (let prop of data.prop_names) {
+                        prop_names.set(prop.identifier, prop);
+                    }
+                    const class_names = new Map();
+                    for (let c of data.class_names) {
+                        class_names.set(c.identifier, c.name);
+                    }
+                    this.setState({loading: false, packets: data.packets, header: data.header, prop_names, class_names});
                     break;
-
+                case "packet":
+                    this.setState({active: data.packet})
             }
         });
-        worker.postMessage(data, [data]);
+        worker.postMessage({
+            type: "data",
+            data
+        }, [data]);
     }
 
-    filteredPackets(): Packet[] {
-        if (this.state.search.filter || this.state.search.entity) {
-            return this.state.packets.filter(packet => filterPacket(packet, this.state.search));
-        } else {
-            return this.state.packets;
-        }
+    filteredPackets(): PacketMeta[] {
+        return this.state.packets;
+        // if (this.state.search.filter || this.state.search.entity) {
+        //     return this.state.packets.filter(packet => filterPacket(packet, this.state.search));
+        // } else {
+        //     return this.state.packets;
+        // }
     }
 
     render() {
-        if (this.state.loading && this.state.header && this.state.packets.length) {
+        if (this.state.loading && this.state.progress > 0) {
             return (
                 <>
                     <h1>Loading</h1>
-                    <p>{this.state.packets.slice(-1)[0].tick}/{this.state.header.ticks}</p>
+                    <progress value={this.state.progress} max={100}/>
                 </>
             )
         } else if (this.state.loading) {
@@ -107,12 +132,15 @@ class App extends Component<{}, AppState> {
             }
             return (
                 <>
-                    <SearchBar onSearch={this.onSearch} class_names={this.state.class_names} prop_names={this.state.prop_names}/>
+                    <SearchBar onSearch={this.onSearch} class_names={this.state.class_names}
+                               prop_names={this.state.prop_names}/>
                     <div className="packets">
                         <PacketTable packets={this.filteredPackets()} class_names={this.state.class_names}
                                      activeIndex={this.state.activeIndex}
                                      prop_names={this.state.prop_names}
-                                     onClick={(activeIndex, active) => this.setState({activeIndex, active})}/>
+                                     onClick={(index) => {
+                                         this.state.worker.postMessage({type: "get", packet: index})
+                                     }}/>
                         {active}
                     </div>
                 </>
@@ -166,10 +194,12 @@ function DemoDropzone(
     )
 }
 
-function debounce(func: Function, timeout = 300){
+function debounce(func: Function, timeout = 300) {
     let timer: any;
-    return (...args:any[]) => {
+    return (...args: any[]) => {
         clearTimeout(timer);
-        timer = setTimeout(() => { func.apply(this, args); }, timeout);
+        timer = setTimeout(() => {
+            func.apply(this, args);
+        }, timeout);
     };
 }

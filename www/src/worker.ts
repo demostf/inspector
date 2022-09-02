@@ -2,22 +2,33 @@ import {Parser} from "demo-inspector";
 
 declare function postMessage(message: any): void;
 
-onmessage = function (event) {
-    let data = event.data as ArrayBuffer;
-    import("demo-inspector")
-        .then(({Parser}) => {
-            console.log(data);
-            let parser = new Parser(new Uint8Array(data));
+let parser: Parser | null = null;
 
-            postMessage({type: "header", header: parser.header()})
+type MessageData = {type: "data", data: ArrayBuffer} | {type: "get", packet: number}
 
-            let packet;
-            do {
-                packet = parser.next();
-                if (packet) {
-                    postMessage({type: "packet", packet})
-                }
-            } while (packet);
-            postMessage({type: "done"})
-        })
+onmessage = function (event: MessageEvent<MessageData>) {
+    const data = event.data;
+    switch (data.type) {
+        case "data":
+            import("demo-inspector")
+                .then(({Parser}) => {
+                    parser = new Parser(new Uint8Array(data.data), (progress: number) => {
+                        postMessage({type: "progress", progress})
+                    });
+                    postMessage({
+                        type: "done",
+                        packets: parser.packets(),
+                        header: parser.header(),
+                        prop_names: parser.prop_names(),
+                        class_names: parser.class_names()
+                    })
+                })
+            break;
+        case "get":
+            if (parser) {
+                const packet = parser.packet(data.packet);
+                postMessage({type: "packet", packet})
+            }
+            break;
+    }
 };
