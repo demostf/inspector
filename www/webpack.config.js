@@ -40,7 +40,6 @@ module.exports = [{
     },
     plugins: [
         new CopyWebpackPlugin({patterns: [{from: 'index.html'}]}),
-        isDevelopment && new webpack.HotModuleReplacementPlugin(),
         isDevelopment && new ReactRefreshWebpackPlugin(),
     ].filter(Boolean),
 }, {
