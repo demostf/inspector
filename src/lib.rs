@@ -1,14 +1,15 @@
+mod search;
 mod utils;
 
-use crate::utils::set_panic_hook;
+use crate::search::{packet_matches, SearchFilter};
 use bitbuffer::{BitRead, BitReadBuffer, BitReadStream, LittleEndian};
 use js_sys::Function;
 use serde::Serialize;
 use tf_demo_parser::demo::header::Header;
 use tf_demo_parser::demo::packet::datatable::{DataTablePacket, SendTableName, ServerClassName};
 use tf_demo_parser::demo::packet::Packet;
+use tf_demo_parser::demo::parser::DemoHandler;
 use tf_demo_parser::demo::parser::RawPacketStream;
-use tf_demo_parser::demo::parser::{DemoHandler, NullHandler};
 use tf_demo_parser::demo::sendprop::SendPropName;
 use wasm_bindgen::prelude::*;
 
@@ -142,6 +143,15 @@ impl Parser {
                 })
                 .unwrap()
             })
+            .collect()
+    }
+
+    pub fn search(&self, filter: JsValue) -> Vec<usize> {
+        let filter: SearchFilter = filter.into_serde().unwrap();
+        self.packets
+            .iter()
+            .enumerate()
+            .filter_map(|(index, packet)| packet_matches(packet, &filter).then_some(index))
             .collect()
     }
 }

@@ -1,12 +1,12 @@
 import {EventInfo, GameEventDefinition, Message, PacketEntity, SendPropValue} from "../parser";
 import React from "react";
-import {filterEntity, filterMessage, Search} from "../search";
+import {filterEntity, filterMessage, isSearchEmpty, SearchFilter} from "../search";
 
 export interface MessageInfoProps {
     msg: Message,
     prop_names: Map<number, { table: String, prop: String }>,
     class_names: Map<number, String>,
-    search: Search
+    search: SearchFilter
 }
 
 export function MessageInfo({msg, prop_names, class_names, search}: MessageInfoProps) {
@@ -105,22 +105,22 @@ function formatEventDefinition(event: GameEventDefinition): string {
     return `${event.event_type}{${values.join(', ')}}`;
 }
 
-function filteredEntities(entities: PacketEntity[], search: Search) {
-    if (search.filter || search.entity) {
+function filteredEntities(entities: PacketEntity[], search: SearchFilter) {
+    if (!isSearchEmpty(search)) {
         return entities.filter(entities => {
             return (search.entity == 0 || search.entity == entities.entity_index) &&
-            (search.filter.length < 3 || filterEntity(entities.server_class, entities.baseline_props.concat(entities.props), search))
+            (search.search.length < 3 || filterEntity(entities.server_class, entities.props, search))
         });
     } else {
         return entities;
     }
 }
 
-function filteredTempEntities(entities: EventInfo[], search: Search) {
+function filteredTempEntities(entities: EventInfo[], search: SearchFilter) {
     if (search.entity) {
         return [];
     }
-    if (search.filter) {
+    if (!isSearchEmpty(search)) {
         return entities.filter(entities => filterEntity(entities.class_id, entities.props, search));
     } else {
         return entities;

@@ -2,9 +2,11 @@ import {Packet} from "./parser";
 import React, {useCallback, Component} from 'react'
 import {useDropzone} from 'react-dropzone'
 import ReactDOM from "react-dom";
+import { createRoot } from 'react-dom/client';
 import {Header} from "./header";
 import {PacketDetails, PacketTable} from "./table";
-import {filterPacket, Search, SearchBar} from "./search";
+import {filterPacket, isSearchEmpty, SearchBar, SearchFilter} from "./search";
+import {ResponseMessageData} from "./rpc";
 
 let _style = require('../styles/style.css');
 
@@ -34,14 +36,10 @@ interface AppState {
     class_names: Map<number, string>,
     active: Packet | null,
     activeIndex: number | null,
-    search: Search,
+    search: SearchFilter,
+    matches: number[],
     worker: Worker
 }
-
-type MessageData = { type: "progress", progress: number }
-    | { type: "packet", packet: Packet }
-    | { type: "done", packets: PacketMeta[], header: Header, prop_names: { identifier: number, table: string, prop: string }[], class_names: { identifier: number, name: string }[] }
-    | { type: "packet_names", packet: {} };
 
 class App extends Component<{}, AppState> {
     state: AppState = {
@@ -55,20 +53,27 @@ class App extends Component<{}, AppState> {
         activeIndex: null,
         search: {
             entity: 0,
-            filter: "",
-            classIds: [],
-            propIds: [],
+            search: "",
+            class_ids: [],
+            prop_ids: [],
         },
+        matches: [],
         worker: null
     }
 
-    onSearch = debounce((search: Search) => this.setState({search}), 500)
+    onSearch = debounce((search: SearchFilter) => {
+        if (!isSearchEmpty(search)) {
+            console.log(search);
+            this.state.worker.postMessage({type: "search", filter: search});
+        }
+        this.setState({search});
+    }, 500)
 
     load(data: ArrayBuffer) {
         this.setState({loading: true});
         const worker = new Worker('./worker.js');
         this.setState({worker});
-        worker.addEventListener("message", (event: MessageEvent<MessageData>) => {
+        worker.addEventListener("message", (event: MessageEvent<ResponseMessageData>) => {
             const data = event.data;
             if (data.type !== "progress") {
                 console.log(data);
@@ -96,7 +101,11 @@ class App extends Component<{}, AppState> {
                     });
                     break;
                 case "packet":
-                    this.setState({active: data.packet})
+                    this.setState({active: data.packet});
+                    break;
+                case "search_result":
+                    this.setState({matches: data.matches});
+                    break;
             }
         });
         worker.postMessage({
@@ -106,12 +115,11 @@ class App extends Component<{}, AppState> {
     }
 
     filteredPackets(): PacketMeta[] {
-        return this.state.packets;
-        // if (this.state.search.filter || this.state.search.entity) {
-        //     return this.state.packets.filter(packet => filterPacket(packet, this.state.search));
-        // } else {
-        //     return this.state.packets;
-        // }
+        if (isSearchEmpty(this.state.search)) {
+            return this.state.packets;
+        } else {
+            return this.state.matches.map(index => this.state.packets[index]);
+        }
     }
 
     render() {
@@ -130,6 +138,7 @@ class App extends Component<{}, AppState> {
             )
         } else if (this.state.packets.length) {
             let active = <></>;
+            const packets = this.filteredPackets();
             if (this.state.active) {
                 active = <div className="details"><PacketDetails packet={this.state.active}
                                                                  search={this.state.search}
@@ -141,7 +150,7 @@ class App extends Component<{}, AppState> {
                     <SearchBar onSearch={this.onSearch} class_names={this.state.class_names}
                                prop_names={this.state.prop_names}/>
                     <div className="packets">
-                        <PacketTable packets={this.filteredPackets()} class_names={this.state.class_names}
+                        <PacketTable packets={packets} class_names={this.state.class_names}
                                      activeIndex={this.state.activeIndex}
                                      prop_names={this.state.prop_names}
                                      onClick={(index) => {
@@ -161,12 +170,9 @@ class App extends Component<{}, AppState> {
     }
 }
 
-ReactDOM.render(
-    <App/>
-    ,
-    document.getElementById("root")
-);
-
+const container = document.getElementById('root');
+const root = createRoot(container);
+root.render(<App/>);
 
 function DemoDropzone({onDrop}: { onDrop: (data: ArrayBuffer) => void }) {
     const onDropCb = useCallback((acceptedFiles: File[]) => {

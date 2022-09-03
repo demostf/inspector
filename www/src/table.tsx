@@ -3,7 +3,7 @@ import {GameEventDefinition, Message, Packet, PacketEntity, SendPropValue, UserC
 import {FixedSizeList as List} from 'react-window';
 import {MessageInfo} from "./packets/message";
 import {UserCmdDetails} from "./packets/usercmd";
-import {filterMessage, filterPacket, Search} from "./search";
+import {filterMessage, filterPacket, SearchFilter} from "./search";
 import {PacketMeta, PacketType} from "./index"
 
 interface TableProps {
@@ -81,11 +81,11 @@ interface DetailProps {
     packet: Packet,
     prop_names: Map<number, { table: string, prop: string }>,
     class_names: Map<number, string>,
-    search: Search,
+    search: SearchFilter,
 }
 
-function filteredMessages(messages: Message[], search: Search) {
-    if (search.filter || search.entity) {
+function filteredMessages(messages: Message[], search: SearchFilter) {
+    if (search.search || search.entity) {
         return messages.filter(message => filterMessage(message, search));
     } else {
         return messages;
