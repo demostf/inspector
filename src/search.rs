@@ -11,18 +11,18 @@ use tf_demo_parser::demo::message::{
     StringCmdMessage,
 };
 use tf_demo_parser::demo::packet::consolecmd::ConsoleCmdPacket;
+use tf_demo_parser::demo::packet::datatable::ClassId;
 use tf_demo_parser::demo::packet::message::MessagePacket;
 use tf_demo_parser::demo::packet::stringtable::{StringTableEntry, StringTablePacket};
 use tf_demo_parser::demo::packet::Packet;
+use tf_demo_parser::demo::sendprop::SendPropIdentifier;
 
 #[derive(Serialize, Deserialize)]
 pub struct SearchFilter {
     pub entity: u32,
     pub search: String,
-    #[serde(default)]
-    pub prop_ids: Vec<u64>,
-    #[serde(default)]
-    pub class_ids: Vec<u32>,
+    pub prop_ids: Vec<SendPropIdentifier>,
+    pub class_ids: Vec<ClassId>,
 }
 
 impl SearchFilter {
@@ -97,7 +97,7 @@ fn message_matches(message: &Message, filter: &SearchFilter) -> bool {
         Message::SetView(SetViewMessage { index }) => (*index as u32) == filter.entity,
         Message::UserMessage(_) => false,
         Message::EntityMessage(EntityMessage { class_id, .. }) => {
-            filter.class_ids.contains(&(*class_id as u32))
+            filter.class_ids.contains(&((*class_id).into()))
         }
         Message::GameEvent(GameEventMessage { event, .. }) => {
             has_search && event.event_type().as_str().contains(&filter.search)

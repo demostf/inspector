@@ -3212,7 +3212,7 @@ export type GameEventValue =
     Boolean: boolean;
 };
 export type GameEventTypeId = number;
-export type SendPropIdentifier = number;
+export type SendPropIdentifier = string;
 export type SendPropValue = Vector | VectorXY | number | number | string | SendPropValue[];
 export type EntityId = number;
 export type ClassId = number;

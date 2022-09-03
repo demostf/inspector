@@ -124,7 +124,7 @@ impl Parser {
             .iter()
             .map(|(identifier, table, prop)| {
                 JsValue::from_serde(&PropName {
-                    identifier: *identifier,
+                    identifier: identifier.to_string(),
                     table: table.to_string(),
                     prop: prop.to_string(),
                 })
@@ -147,7 +147,7 @@ impl Parser {
     }
 
     pub fn search(&self, filter: JsValue) -> Vec<usize> {
-        let filter: SearchFilter = filter.into_serde().unwrap();
+        let filter: SearchFilter = filter.into_serde().expect("failed to parse search filter");
         self.packets
             .iter()
             .enumerate()
@@ -158,7 +158,7 @@ impl Parser {
 
 #[derive(Serialize)]
 pub struct PropName {
-    pub identifier: u64,
+    pub identifier: String,
     pub table: String,
     pub prop: String,
 }

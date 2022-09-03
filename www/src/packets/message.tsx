@@ -4,7 +4,7 @@ import {filterEntity, filterMessage, isSearchEmpty, SearchFilter} from "../searc
 
 export interface MessageInfoProps {
     msg: Message,
-    prop_names: Map<number, { table: String, prop: String }>,
+    prop_names: Map<string, { table: String, prop: String }>,
     class_names: Map<number, String>,
     search: SearchFilter
 }
@@ -78,7 +78,7 @@ function formatPropValue(value: SendPropValue): string {
     }
 }
 
-function formatEntity(entity: PacketEntity, prop_names: Map<number, { table: String, prop: String }>, class_names: Map<number, String>,): string {
+function formatEntity(entity: PacketEntity, prop_names: Map<string, { table: String, prop: String }>, class_names: Map<number, String>,): string {
     let class_name = class_names.get(entity.server_class);
     // let baseline = entity.baseline_props.map(prop => {
     //     let names = prop_names.get(prop.identifier);

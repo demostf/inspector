@@ -8,7 +8,7 @@ import {PacketMeta, PacketType} from "./index"
 
 interface TableProps {
     packets: PacketMeta[],
-    prop_names: Map<number, { table: string, prop: string }>,
+    prop_names: Map<string, { table: string, prop: string }>,
     class_names: Map<number, string>,
     onClick: (i: number) => void,
     activeIndex: number | null,
@@ -79,7 +79,7 @@ export function PacketRow({packet}: RowProps) {
 
 interface DetailProps {
     packet: Packet,
-    prop_names: Map<number, { table: string, prop: string }>,
+    prop_names: Map<string, { table: string, prop: string }>,
     class_names: Map<number, string>,
     search: SearchFilter,
 }

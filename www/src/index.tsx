@@ -32,7 +32,7 @@ interface AppState {
     header: Header | null,
     progress: number,
     packets: PacketMeta[],
-    prop_names: Map<number, { table: string, prop: string }>,
+    prop_names: Map<string, { table: string, prop: string }>,
     class_names: Map<number, string>,
     active: Packet | null,
     activeIndex: number | null,

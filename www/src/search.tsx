@@ -6,13 +6,13 @@ import {Message, Packet, SendProp, StringTable} from "./parser";
 export interface SearchFilter {
     entity: number,
     search: string,
-    prop_ids: number[],
+    prop_ids: string[],
     class_ids: number[],
 }
 
 export interface SearchBarProps {
     onSearch: (search: SearchFilter) => void,
-    prop_names: Map<number, { table: string, prop: string }>,
+    prop_names: Map<string, { table: string, prop: string }>,
     class_names: Map<number, string>,
 }
 
@@ -91,7 +91,7 @@ export function filterPacket(
     }
 }
 
-function filterPropNames(prop_names: Map<number, { table: string, prop: string }>, filter: string): number[] {
+function filterPropNames(prop_names: Map<string, { table: string, prop: string }>, filter: string): string[] {
     if (filter.length === 0) {
         return [];
     }
@@ -166,7 +166,7 @@ export function filterEntity(class_id: number, props: SendProp[], search: Search
         return true;
     }
 
-    return search.class_ids.includes(class_id) || props.some(prop => search.prop_ids.includes(prop.identifier))
+    return search.class_ids.includes(class_id) || props.some(prop => search.prop_ids.includes(`${prop.identifier}`))
         || props.some(prop => prop.value == search.search);
 }
 
