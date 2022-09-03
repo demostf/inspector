@@ -40,7 +40,7 @@ interface AppState {
 
 type MessageData = { type: "progress", progress: number }
     | { type: "packet", packet: Packet }
-    | { type: "done", packets: PacketMeta[], header: Header, prop_names: {identifier: number, table: string, prop: string}[], class_names: {identifier: number, name: string}[] }
+    | { type: "done", packets: PacketMeta[], header: Header, prop_names: { identifier: number, table: string, prop: string }[], class_names: { identifier: number, name: string }[] }
     | { type: "packet_names", packet: {} };
 
 class App extends Component<{}, AppState> {
@@ -87,7 +87,13 @@ class App extends Component<{}, AppState> {
                     for (let c of data.class_names) {
                         class_names.set(c.identifier, c.name);
                     }
-                    this.setState({loading: false, packets: data.packets, header: data.header, prop_names, class_names});
+                    this.setState({
+                        loading: false,
+                        packets: data.packets,
+                        header: data.header,
+                        prop_names,
+                        class_names
+                    });
                     break;
                 case "packet":
                     this.setState({active: data.packet})
@@ -162,16 +168,8 @@ ReactDOM.render(
 );
 
 
-function DemoDropzone(
-    {
-        onDrop
-    }
-        :
-        {
-            onDrop: (data: ArrayBuffer) => void
-        }
-) {
-    const onDropCb = useCallback(acceptedFiles => {
+function DemoDropzone({onDrop}: { onDrop: (data: ArrayBuffer) => void }) {
+    const onDropCb = useCallback((acceptedFiles: File[]) => {
         let reader = new FileReader();
         reader.readAsArrayBuffer(acceptedFiles[0]);
         reader.addEventListener('load', () => {
