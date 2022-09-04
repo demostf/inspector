@@ -68,6 +68,7 @@ export class App extends Component<{}, AppState> {
     }, 500)
 
     selectPacket = (packet: number) => {
+        this.setState({activeIndex: packet});
         this.state.worker.get(packet).then(packet => this.setState({active: packet}));
     }
 
