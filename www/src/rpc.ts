@@ -2,8 +2,6 @@ import {SearchFilter} from "./search";
 import {Packet} from "./parser";
 import {Header} from "./header";
 import {PacketMeta} from "./App";
-import {Simulate} from "react-dom/test-utils";
-import progress = Simulate.progress;
 
 export type RequestMessageData = { type: "data", sequence?: number, data: ArrayBuffer }
     | { type: "get", sequence?: number, packet: number }
@@ -15,11 +13,13 @@ export type ResponseMessageData = { type: "error", sequence: number, e: Error }
     | { type: "done", sequence: number, packets: PacketMeta[], header: Header, prop_names: { identifier: string, table: string, prop: string }[], class_names: { identifier: number, name: string }[] }
     | { type: "search_result", sequence: number, matches: number[] };
 
-const ResponseTypeMap = {
+type ResponseTypeMap = {
     "search": "search_result",
     "get": "packet",
     "data": "done",
 }
+
+type ResponseTypeFor<T extends RequestMessageData> = {type: ResponseTypeMap[T['type']]} & ResponseMessageData
 
 export interface ParsedDemo {
     packets: PacketMeta[],
@@ -30,7 +30,6 @@ export interface ParsedDemo {
 
 export class DemoWorker {
     worker: Worker
-    packets: PacketMeta[] = [];
     lastSequence = 0;
     callbacks: Map<number, [(_: ResponseMessageData) => void, (_: Error) => void]>;
     onProgress: null | ((progress: number) => void) = null;
@@ -56,12 +55,12 @@ export class DemoWorker {
         });
     }
 
-    postMessage(message: RequestMessageData, transfer: Transferable[] = []): Promise<ResponseMessageData> {
+    postMessage<T extends RequestMessageData>(message: T, transfer: Transferable[] = []): Promise<ResponseTypeFor<T>> {
         const sequence = this.lastSequence++;
         message.sequence = sequence;
         this.worker.postMessage(message, transfer);
         return new Promise((resolve, reject) => {
-            this.callbacks.set(sequence, [resolve, reject]);
+            this.callbacks.set(sequence, [resolve as (_: ResponseMessageData) => void, reject]);
         });
     }
 
@@ -72,11 +71,7 @@ export class DemoWorker {
             data,
         }, [data]);
         this.onProgress = null;
-        if (response.type === "done") {
-            return response;
-        } else {
-            throw new Error("Invalid response type");
-        }
+        return response;
     }
 
     public async get(packet: number): Promise<Packet> {
@@ -84,11 +79,7 @@ export class DemoWorker {
             type: "get",
             packet,
         });
-        if (response.type === "packet") {
-            return response.packet;
-        } else {
-            throw new Error("Invalid response type");
-        }
+        return response.packet;
     }
 
     public async search(filter: SearchFilter): Promise<number[]> {
@@ -96,10 +87,6 @@ export class DemoWorker {
             type: "search",
             filter,
         });
-        if (response.type === "search_result") {
-            return response.matches;
-        } else {
-            throw new Error("Invalid response type");
-        }
+        return response.matches;
     }
 }
