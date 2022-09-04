@@ -4,7 +4,7 @@ import {FixedSizeList as List} from 'react-window';
 import {MessageInfo} from "./packets/message";
 import {UserCmdDetails} from "./packets/usercmd";
 import {filterMessage, filterPacket, SearchFilter} from "./search";
-import {PacketMeta, PacketType} from "./index"
+import {PacketMeta, PacketType} from "./App"
 
 interface TableProps {
     packets: PacketMeta[],
