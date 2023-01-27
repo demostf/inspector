@@ -12,7 +12,7 @@
     "start": "webpack serve --hot"
   },
   "dependencies": {
-    "demo-inspector": "file:../pkg",
+    "demo-inspector": "file:../wasm/pkg",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "react-dropzone": "^14.2.2",
@@ -26,6 +26,7 @@
     "@types/react-virtualized-auto-sizer": "^1.0.1",
     "@types/react-window": "^1.8.5",
     "@webpack-cli/serve": "^1.7.0",
+    "@babel/core": "^7.20.12",
     "babel-loader": "^8.2.5",
     "copy-webpack-plugin": "^11.0.0",
     "css-loader": "^6.7.1",
