@@ -81,23 +81,22 @@
 
       packages.demo-inspector-wasm = pkgs.demo-inspector-wasm;
 
+      packages.node_modules = pkgs.node_modules;
+
       packages.demo-inspector = pkgs.stdenv.mkDerivation rec {
         name = "demo-inspector";
         version = "0.1.0";
 
         src = ./www;
 
-        buildInputs = with pkgs; [nodejs];
+        nativeBuildInputs = with pkgs; [nodejs];
         buildPhase = with pkgs; ''
-          ln -s ${node_modules}/node_modules ./node_modules
-          ls -l ./node_modules/
+          cp -r ${node_modules}/node_modules ./node_modules
           npm run build
         '';
 
         installPhase = ''
-          mkdir -p $out
-          cp index.html $out/
-          cp -r dist $out/
+          cp -r dist $out
         '';
       };
       defaultPackage = packages.demo-inspector;
