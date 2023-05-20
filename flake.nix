@@ -2,7 +2,11 @@
   inputs = {
     nixpkgs.url = "nixpkgs/release-22.11";
     utils.url = "github:numtide/flake-utils";
-    rust-overlay.url = "github:oxalica/rust-overlay";
+    rust-overlay = {
+      url = "github:oxalica/rust-overlay";
+      inputs.nixpkgs.follows = "nixpkgs";
+      inputs.flake-utils.follows = "utils";
+    };
     npmlock2nix = {
       url = "github:nix-community/npmlock2nix";
       flake = false;
