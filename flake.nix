@@ -1,6 +1,6 @@
 {
   inputs = {
-    nixpkgs.url = "nixpkgs/release-22.11";
+    nixpkgs.url = "nixpkgs/release-23.05";
     utils.url = "github:numtide/flake-utils";
     rust-overlay = {
       url = "github:oxalica/rust-overlay";
@@ -29,7 +29,7 @@
             targets = [ "wasm32-unknown-unknown" ];
           });
           demo-inspector-wasm = import ./wasm.nix final;
-          nodejs = final.nodejs-16_x;
+          nodejs = final.nodejs_20;
           node_modules = let
             without-local-deps =
               prev.stdenv.mkDerivation {
@@ -54,6 +54,7 @@
             npmlock2nix-d =
               final.npmlock2nix.v2.node_modules {
                 src = without-local-deps;
+                nodejs = final.nodejs;
               };
 
             with-local-deps =
@@ -77,7 +78,7 @@
           cargo-edit
           bacon
           wasm-pack
-          nodejs
+          nodejs_20
           node2nix
           wasm-bindgen-cli
         ];
@@ -93,7 +94,7 @@
 
         src = ./www;
 
-        nativeBuildInputs = with pkgs; [nodejs];
+        nativeBuildInputs = with pkgs; [nodejs_20];
         buildPhase = with pkgs; ''
           cp -r ${node_modules}/node_modules ./node_modules
           npm run build

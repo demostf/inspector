@@ -13,7 +13,7 @@ pkgs: let
 
     buildInputs = with pkgs; [ openssl ];
 
-    checkInputs = [ pkgs.nodejs ];
+    checkInputs = [ pkgs.nodejs_20 ];
 
     # other tests require it to be ran in the wasm-bindgen monorepo
     cargoTestFlags = [ "--test=interface-types" ];
@@ -26,7 +26,8 @@ in pkgs.rustPlatform.buildRustPackage rec {
 
   src = ./wasm;
 
-  nativeBuildInputs = [pkgs.rust-wasm pkgs.wasm-pack wasm-bindgen-cli];
+  WASM_PACK_CACHE = "/build/cache";
+  nativeBuildInputs = [pkgs.rust-wasm pkgs.wasm-pack wasm-bindgen-cli pkgs.binaryen];
   buildPhase = ''
    runHook preBuild
    (
