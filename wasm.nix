@@ -5,24 +5,25 @@ pkgs: let
     version = deps.wasm-bindgen.version;
     src = pkgs.fetchCrate {
       inherit pname version;
-      sha256 = "sha256-+PWxeRL5MkIfJtfN3/DjaDlqRgBgWZMa6dBt1Q+lpd0=";
+      sha256 = "sha256-IPxP68xtNSpwJjV2yNMeepAS0anzGl02hYlSTvPocz8=";
     };
 
-    cargoSha256 = "sha256-GwLeA6xLt7I+NzRaqjwVpt1pzRex1/snq30DPv4FR+g=";
+    cargoSha256 = "sha256-pBeQaG6i65uJrJptZQLuIaCb/WCQMhba1Z1OhYqA8Zc=";
     nativeBuildInputs = [ pkgs.pkg-config ];
 
     buildInputs = with pkgs; [ openssl ];
 
     checkInputs = [ pkgs.nodejs_20 ];
 
-    # other tests require it to be ran in the wasm-bindgen monorepo
-    cargoTestFlags = [ "--test=interface-types" ];
+    dontCargoCheck = true;
   };
 in pkgs.rustPlatform.buildRustPackage rec {
   name = "demo-inspector-wasm";
   version = "0.1.0";
 
-  cargoSha256 = "sha256-WjYIwkvMi82Wq4eCTve44sAL6DHtQBK2x7Ng5uw3fqQ=";
+  cargoLock = {
+    lockFile = ./wasm/Cargo.lock;
+  };
 
   src = ./wasm;
 

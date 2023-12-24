@@ -8,7 +8,7 @@
       inputs.flake-utils.follows = "utils";
     };
     npmlock2nix = {
-      url = "github:nix-community/npmlock2nix";
+      url = "github:icewind1991/npmlock2nix/local-packages";
       flake = false;
     };
   };
@@ -30,42 +30,14 @@
           });
           demo-inspector-wasm = import ./wasm.nix final;
           nodejs = final.nodejs_20;
-          node_modules = let
-            without-local-deps =
-              prev.stdenv.mkDerivation {
-                name = "demo-inspector-without-local-deps";
-                src = ./www;
-                buildInputs = [ prev.jq ];
-                installPhase = ''
-                  mkdir $out
-                  cat $src/package.json \
-                        | jq 'del( .dependencies."demo-inspector" )' \
-                        > $out/package.json
-                  cat $src/package-lock.json \
-                        | jq 'del( .packages."".dependencies."demo-inspector" )' \
-                        | jq 'del( .dependencies."demo-inspector" )' \
-                        | jq 'del( .packages."demo-inspector" )' \
-                        | jq 'del( .packages."../wasm/pkg" )' \
-                        | jq 'del( .packages."node_modules/demo-inspector" )' \
-                        > $out/package-lock.json
-                '';
-              };
 
-            npmlock2nix-d =
-              final.npmlock2nix.v2.node_modules {
-                src = without-local-deps;
-                nodejs = final.nodejs;
-              };
-
-            with-local-deps =
-              pkgs.runCommand "demo-inspector-with-local-deps" {} ''
-                mkdir $out
-                cp -r -- ${npmlock2nix-d}/node_modules $out
-                chmod +w -R $out/node_modules
-                cp -r -- ${final.demo-inspector-wasm} $out/node_modules/demo-inspector
-              '';
-
-            in with-local-deps;
+          node_modules = final.npmlock2nix.v2.node_modules {
+            src = ./www;
+            nodejs = final.nodejs;
+            localPackages = {
+              "demo-inspector" = final.demo-inspector-wasm;
+            };
+          };
         })
       ];
       pkgs = import nixpkgs {
