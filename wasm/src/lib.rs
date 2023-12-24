@@ -52,7 +52,7 @@ impl Parser {
         let mut class_names = Vec::new();
 
         while let Some(packet) = packet_stream.next(handler.get_parser_state()).unwrap() {
-            let tick = packet.tick();
+            let tick = u32::from(packet.tick());
             packets.push(packet.clone());
 
             if let Packet::DataTables(DataTablePacket {
@@ -108,7 +108,7 @@ impl Parser {
             .enumerate()
             .map(|(index, packet)| PacketMeta {
                 index,
-                tick: packet.tick(),
+                tick: u32::from(packet.tick()),
                 ty: packet.packet_type() as u8,
             })
             .map(|meta| JsValue::from_serde(&meta).unwrap())
