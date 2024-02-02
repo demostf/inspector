@@ -147,7 +147,7 @@ export function filterMessage(
         case "EntityMessage":
             return search.entity == 0 && search.class_ids.includes(message.class_id)
         case "GameEvent":
-            return search.entity == 0 && message.event.type.includes(search.search)
+            return search.entity == 0 && (message.event_type as string).includes(search.search)
         case "PacketEntities":
             return message.removed_entities.includes(search.entity)
                 || message.entities.some(entity => (search.entity == 0 || entity.entity_index == search.entity)

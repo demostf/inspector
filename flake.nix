@@ -40,13 +40,12 @@
           nodejs_20
           node2nix
           wasm-bindgen-cli
+          json-schema-to-typescript
         ];
       };
 
       packages = rec {
-        wasm = pkgs.demo-inspector-wasm;
-        node_modules = pkgs.demo-inspector-node-modules;
-        demo-inspector = pkgs.demo-inspector;
+        inherit (pkgs) json-schema-to-typescript demo-inspector demo-inspector-wasm demo-inspector-node-modules;
         default = demo-inspector;
       };
     })

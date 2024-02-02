@@ -60,6 +60,11 @@ export function MessageInfo({msg, prop_names, class_names, search}: MessageInfoP
                 return `temp entity ${class_name}(delay: ${event.fire_delay}, reliable:${JSON.stringify(event.reliable)}): ` + props.join(', ');
             })
             return <>{events.map(event => <p>{event}</p>)}</>
+        case "GameEvent":
+            let event = msg.event;
+            let type = msg.event_type;
+            delete event.type;
+            return <>{type}: {Object.keys(event).map(key => `${key}=${event[key]}`).join(', ')}</>
         default:
             let json = msg;
             // delete json.type;

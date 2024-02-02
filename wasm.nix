@@ -7,17 +7,19 @@
   rust-bin,
   wasm-pack,
   binaryen,
+  lib
 }: let
   deps = (builtins.fromTOML (builtins.readFile ./wasm/Cargo.toml)).dependencies;
+  wasm-bindgen-version = lib.strings.removePrefix "=" deps.wasm-bindgen.version;
   wasm-bindgen-cli = rustPlatform.buildRustPackage rec {
     pname = "wasm-bindgen-cli";
-    version = deps.wasm-bindgen.version;
+    version = wasm-bindgen-version;
     src = fetchCrate {
       inherit pname version;
-      sha256 = "sha256-IPxP68xtNSpwJjV2yNMeepAS0anzGl02hYlSTvPocz8=";
+      sha256 = "sha256-X8+DVX7dmKh7BgXqP7Fp0smhup5OO8eWEhn26ODYbkQ=";
     };
 
-    cargoSha256 = "sha256-pBeQaG6i65uJrJptZQLuIaCb/WCQMhba1Z1OhYqA8Zc=";
+    cargoSha256 = "sha256-ckJxAR20GuVGstzXzIj1M0WBFj5eJjrO2/DRMUK5dwM=";
     nativeBuildInputs = [pkg-config];
 
     buildInputs = [openssl];
@@ -36,6 +38,9 @@ in
 
     cargoLock = {
       lockFile = ./wasm/Cargo.lock;
+      outputHashes = {
+         "tf-demo-parser-0.5.0" = "sha256-bwQ4AqF+YMXBVLi7mxGSqZhj6+P086pNT1QR5ivTB8U=";
+      };
     };
 
     src = ./wasm;
