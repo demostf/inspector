@@ -19,7 +19,7 @@
       sha256 = "sha256-X8+DVX7dmKh7BgXqP7Fp0smhup5OO8eWEhn26ODYbkQ=";
     };
 
-    cargoSha256 = "sha256-ckJxAR20GuVGstzXzIj1M0WBFj5eJjrO2/DRMUK5dwM=";
+    cargoHash = "sha256-ckJxAR20GuVGstzXzIj1M0WBFj5eJjrO2/DRMUK5dwM=";
     nativeBuildInputs = [pkg-config];
 
     buildInputs = [openssl];

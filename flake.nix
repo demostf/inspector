@@ -1,6 +1,6 @@
 {
   inputs = {
-    nixpkgs.url = "nixpkgs/release-23.05";
+    nixpkgs.url = "nixpkgs/release-24.11";
     utils.url = "github:numtide/flake-utils";
     rust-overlay = {
       url = "github:oxalica/rust-overlay";
@@ -24,6 +24,7 @@
       overlays = [
         (import rust-overlay)
         (final: prev: {
+          nodejs-16_x = final.nodejs;
           npmlock2nix = import npmlock2nix {pkgs = final;};
         })
         (import ./overlay.nix)
