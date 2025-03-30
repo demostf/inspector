@@ -1,12 +1,16 @@
 {
-  npmlock2nix,
-  nodejs_20,
+  importNpmLock,
   demo-inspector-wasm,
-}:
-npmlock2nix.v2.node_modules {
-  src = ./www;
-  nodejs = nodejs_20;
-  localPackages = {
-    "demo-inspector" = demo-inspector-wasm;
+  nodejs,
+}: importNpmLock.buildNodeModules {
+  npmRoot = ./www;
+  derivationArgs = {
+    npmDeps = importNpmLock {
+      npmRoot = ./www;
+      packageSourceOverrides = {
+        "node_modules/demo-inspector" = demo-inspector-wasm;
+      };
+    };
   };
+  inherit nodejs;
 }

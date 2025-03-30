@@ -5,11 +5,6 @@
     rust-overlay = {
       url = "github:oxalica/rust-overlay";
       inputs.nixpkgs.follows = "nixpkgs";
-      inputs.flake-utils.follows = "utils";
-    };
-    npmlock2nix = {
-      url = "github:icewind1991/npmlock2nix/local-packages";
-      flake = false;
     };
   };
 
@@ -18,15 +13,10 @@
     nixpkgs,
     utils,
     rust-overlay,
-    npmlock2nix,
   }:
     utils.lib.eachDefaultSystem (system: let
       overlays = [
         (import rust-overlay)
-        (final: prev: {
-          nodejs-16_x = final.nodejs;
-          npmlock2nix = import npmlock2nix {pkgs = final;};
-        })
         (import ./overlay.nix)
       ];
       pkgs = import nixpkgs {
