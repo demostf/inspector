@@ -7,7 +7,7 @@ stdenv.mkDerivation rec {
   name = "demo-inspector";
   version = "0.1.0";
 
-  src = ./www;
+  src = ../www;
 
   nativeBuildInputs = [nodejs_20];
   buildPhase = ''

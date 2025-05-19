@@ -17,7 +17,7 @@
     utils.lib.eachDefaultSystem (system: let
       overlays = [
         (import rust-overlay)
-        (import ./overlay.nix)
+        (import ./nix/overlay.nix)
       ];
       pkgs = import nixpkgs {
         inherit system overlays;
@@ -41,6 +41,6 @@
       };
     })
     // {
-      overlays.default = import ./overlay.nix;
+      overlays.default = import ./nix/overlay.nix;
     };
 }

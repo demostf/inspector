@@ -65,4 +65,7 @@ module.exports = [{
         syncWebAssembly: true
     },
     mode: "development",
+    experiments: {
+        asyncWebAssembly: true,
+    },
 }];

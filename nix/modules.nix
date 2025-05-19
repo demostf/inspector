@@ -3,10 +3,10 @@
   demo-inspector-wasm,
   nodejs,
 }: importNpmLock.buildNodeModules {
-  npmRoot = ./www;
+  npmRoot = ../www;
   derivationArgs = {
     npmDeps = importNpmLock {
-      npmRoot = ./www;
+      npmRoot = ../www;
       packageSourceOverrides = {
         "node_modules/demo-inspector" = demo-inspector-wasm;
       };
